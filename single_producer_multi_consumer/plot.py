@@ -20,7 +20,8 @@ title = f"Benchmarks SP - MC  Homogêneos\nMédia: {mean:.2f} ns, Desvio Padrão
 
 sns.set(style="whitegrid")
 plt.figure(figsize=(10, 6))
-sns.histplot(elapsed_time, bins=250, stat="density"xmin, xmax = plt.xlim()
+sns.histplot(elapsed_time, bins=250, stat="density")
+xmin, xmax = plt.xlim()
 x = np.linspace(0, xmax, 500)
 p = norm.pdf(x, mean, std_dev)
 plt.plot(x, p,'k', linewidth=2)
