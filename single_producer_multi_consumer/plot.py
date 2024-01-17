@@ -16,7 +16,7 @@ median = elapsed_time.median()
 
 print("Mediana:"+str(median)+" ns.")
 
-title = f"Benchmarks SP - MC  Homogêneos\nMédia: {mean:.2f} ns, Desvio Padrão: {std_dev:.2f} ns"
+title = f"Benchmarks SP - MC  Homogêneos\nMédia: {mean:.2f} ns, Desvio Padrão: {std_dev:.2f} ns, Mediana: {median:.2f} ns"
 
 sns.set(style="whitegrid")
 plt.figure(figsize=(10, 6))
