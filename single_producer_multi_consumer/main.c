@@ -69,16 +69,9 @@ int main(int argc, char *argv[]) {
   CPU_SET(cpuPinOne, &cpusetOne);
   CPU_SET(cpuPinTwo, &cpusetTwo);
 
-  //  rc = pthread_create(&threadZero, NULL, populate_matrix, (void *)matrix);
-  //  if (rc != 0)
-  //    perror("Creating thread one failed");
-  //
-  //  rc = pthread_setaffinity_np(threadOne, sizeof(cpusetOne), &cpusetOne);
-  //  if (rc != 0)
-  //    perror("Setting affinity for thread one failed");
-  //  rc = pthread_setaffinity_np(threadTwo, sizeof(cpusetOne), &cpusetTwo);
-  //  if (rc != 0)
-  //    perror("Setting affinity for thread two failed");
+  rc = pthread_create(&threadZero, NULL, populate_matrix, (void *)matrix);
+  if (rc != 0)
+    perror("Creating thread one failed");
 
   pthread_join(threadZero, NULL);
 
@@ -99,6 +92,13 @@ int main(int argc, char *argv[]) {
                       (void *)&second_thread_arguments);
   if (rc != 0)
     perror("Creating thread two failed");
+
+  rc = pthread_setaffinity_np(threadOne, sizeof(cpusetOne), &cpusetOne);
+  if (rc != 0)
+    perror("Setting affinity for thread one failed");
+  rc = pthread_setaffinity_np(threadTwo, sizeof(cpusetOne), &cpusetTwo);
+  if (rc != 0)
+    perror("Setting affinity for thread two failed");
 
   struct timespec start_time = timer_start();
 
