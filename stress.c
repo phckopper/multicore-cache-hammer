@@ -7,10 +7,11 @@
 #include <pthread.h>
 #include <time.h>
 
-#define MATRIX_SIZE 100000
-#define ITERS 10000
+#define MATRIX_SIZE 10000
+#define ITERS 100000
 
-pthread_mutex_t mutex;
+int pingpong = 1;
+int matrix_size, iters;
 
 // call this function to start a nanosecond-resolution timer
 struct timespec timer_start(){
@@ -27,23 +28,35 @@ long timer_end(struct timespec start_time){
     return diffInNanos;
 }
 
-void incrementerThread(int *matrix) {
-    for(int i = 0; i < ITERS; i++) {
-        pthread_mutex_lock(&mutex);
-        for(int j = 0; j < MATRIX_SIZE; j++)
+void incrementerThread1(int *matrix) {
+    for(int i = 0; i < iters; i++) {
+        while(pingpong != 1);
+        for(int j = 0; j < matrix_size; j++)
             matrix[j]++;
-        pthread_mutex_unlock(&mutex);
+        pingpong = 2;
+    }
+}
+
+void incrementerThread2(int *matrix) {
+    for(int i = 0; i < iters; i++) {
+        while(pingpong != 2)
+        for(int j = 0; j < matrix_size; j++)
+            matrix[j]++;
+        pingpong = 1;
     }
 }
 
 int main(int argc, char *argv[]) {
-    if(argc != 3) {
-        puts("syntax: <cpu1> <cpu2>");
+    if(argc != 5) {
+        puts("syntax: <cpu1> <cpu2> <matrix size> <iters>");
         exit(EXIT_FAILURE);
     }
 
     int cpuPinOne = atoi(argv[1]);
     int cpuPinTwo = atoi(argv[2]);
+
+    matrix_size = atoi(argv[3]);
+    iters = atoi(argv[4]);
 
     cpu_set_t cpusetOne;
     cpu_set_t cpusetTwo;
@@ -51,15 +64,13 @@ int main(int argc, char *argv[]) {
     pthread_t threadOne;
     pthread_t threadTwo;
 
-    pthread_mutex_init(&mutex, NULL);
-
     int rc;
     int *matrix = malloc(MATRIX_SIZE * sizeof(int));
 
-    rc = pthread_create(&threadOne, NULL, incrementerThread, (void *) matrix);
+    rc = pthread_create(&threadOne, NULL, incrementerThread1, (void *) matrix);
     if(rc != 0)
         perror("Creating thread one failed");
-    rc = pthread_create(&threadTwo, NULL, incrementerThread, (void *) matrix);
+    rc = pthread_create(&threadTwo, NULL, incrementerThread2, (void *) matrix);
     if(rc != 0)
         perror("Creating thread two failed");
 
